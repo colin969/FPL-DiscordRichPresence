@@ -1,0 +1,45 @@
+{
+  "name": "discord-rich-presence",
+  "displayName": "Discord Rich Presence",
+  "author": "Colin Berry",
+  "version": "1.0.0",
+  "launcherVersion": "9.1.0",
+  "description": "Shows the games you're playing on your Discord presence.",
+  "icon": "icon.png",
+  "main": "./dist/ext.js",
+  "contributes": {
+    "configuration": [
+      {
+        "title": "Discord Rich Presence",
+        "properties": {
+          "com.discord-rich-presence.show-extreme": {
+            "title": "Display Extreme Games",
+            "type": "boolean",
+            "default": false,
+            "description": "If ticked, the game you are playing will appear on your Discord profile regardless of if it is labeled \"Extreme\" or not."
+          }
+        }
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/discord-rpc": "^3.0.4",
+    "@types/node": "14.10.1",
+    "gulp": "4.0.2",
+    "gulp-zip": "5.0.2",
+    "merge-stream": "2.0.0",
+    "ts-loader": "8.0.3",
+    "typescript": "4.0.2",
+    "webpack": "4.44.1",
+    "webpack-cli": "3.3.12"
+  },
+  "scripts": {
+    "package": "gulp",
+    "build": "webpack --mode development",
+    "watch": "webpack --mode development --watch"
+  },
+  "dependencies": {
+    "discord-rpc": "^3.1.4",
+    "ts-debounce": "^2.0.1"
+  }
+}
