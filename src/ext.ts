@@ -28,7 +28,7 @@ export async function activate(context: flashpoint.ExtensionContext) {
   flashpoint.services.onServiceRemove((process) => {
     if (process.id.startsWith('game.') && process.id.length > 5) {
       let closedId = process.id.substr(5);
-      if (closedId === curGame.id) {
+      if (curGame !== undefined && closedId === curGame.id) {
         curActivity = createActivity();
         curGame = undefined;
       }
