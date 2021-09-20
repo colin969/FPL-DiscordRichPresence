@@ -1,5 +1,4 @@
 name: Nightly Builds
-# Forcing workflow, remove later
 
 on:
   schedule:
@@ -7,7 +6,7 @@ on:
     - cron:  '0 0 * * *'
   push:
     branches:
-      - main
+      - master
 
 jobs:
   create-release:
