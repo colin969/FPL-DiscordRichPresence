@@ -1,6 +1,5 @@
 import * as flashpoint from 'flashpoint-launcher';
 import * as DiscordRPC from 'discord-rpc';
-import { debounce } from 'ts-debounce';
 
 const clientId = "732942533373460560"; 
 
@@ -20,7 +19,7 @@ export async function activate(context: flashpoint.ExtensionContext) {
   client.login({ clientId }).catch(flashpoint.log.error);
 
   flashpoint.games.onDidLaunchGame((game) => {
-    if (!flashpoint.getExtConfigValue('com.discord-rich-presence.show-extreme') && game.extreme) { return; }
+    if (!flashpoint.getExtConfigValue('com.discord-rich-presence.show-extreme') && flashpoint.games.isGameExtreme(game)) { return; }
     curActivity = createActivity(game);
     curGame = game;
   });
@@ -43,7 +42,7 @@ export async function activate(context: flashpoint.ExtensionContext) {
 
 async function setActivity(client: DiscordRPC.Client, activity: DiscordRPC.Presence) {
   return client.setActivity(activity);
-};
+}
 
 function createActivity(game?: flashpoint.Game): DiscordRPC.Presence {
   if (game) {

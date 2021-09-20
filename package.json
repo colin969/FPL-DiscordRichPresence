@@ -16,7 +16,7 @@
             "title": "Display Extreme Games",
             "type": "boolean",
             "default": false,
-            "description": "If ticked, the game you are playing will appear on your Discord profile regardless of if it is labeled \"Extreme\" or not."
+            "description": "If ticked, the game you are playing will appear on your Discord profile regardless of if it is labeled with an \"Extreme\" tag or not."
           }
         }
       }
