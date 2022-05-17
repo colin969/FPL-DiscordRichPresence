@@ -19,6 +19,7 @@ const config = {
   devtool: undefined,
   externals: {
     "flashpoint-launcher": "commonjs flashpoint-launcher",
+    "sqlite3": "commonjs sqlite3"
   },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader

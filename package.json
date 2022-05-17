@@ -23,9 +23,9 @@
     ]
   },
   "devDependencies": {
-    "@types/discord-rpc": "^3.0.4",
+    "@types/discord-rpc": "^4.0.3",
     "@types/flashpoint-launcher": "^10.1.0",
-    "@types/node": "14.10.1",
+    "@types/node": "16.x",
     "gulp": "4.0.2",
     "gulp-zip": "5.0.2",
     "merge-stream": "2.0.0",
@@ -40,7 +40,7 @@
     "watch": "webpack --mode development --watch"
   },
   "dependencies": {
-    "discord-rpc": "^3.1.4",
+    "discord-rpc": "^4.0.1",
     "ts-debounce": "^2.0.1"
   }
 }
