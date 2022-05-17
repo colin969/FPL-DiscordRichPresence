@@ -2,13 +2,14 @@ import * as flashpoint from 'flashpoint-launcher';
 import * as DiscordRPC from 'discord-rpc';
 
 const clientId = "732942533373460560"; 
+let client: DiscordRPC.Client;
 
 export async function activate(context: flashpoint.ExtensionContext) {
   const registerSub = (d: flashpoint.Disposable) => { flashpoint.registerDisposable(context.subscriptions, d)};
   let curActivity = createActivity();
   let curGame: flashpoint.Game | undefined = undefined;
 
-  const client = new DiscordRPC.Client({ transport: 'ipc' });
+  client = new DiscordRPC.Client({ transport: 'ipc' });
   client.on('ready', () => {
     flashpoint.log.debug('Discord RPC Connected!');
     setActivity(client, curActivity);
@@ -26,18 +27,24 @@ export async function activate(context: flashpoint.ExtensionContext) {
 
   flashpoint.services.onServiceRemove((process) => {
     if (process.id.startsWith('game.') && process.id.length > 5) {
-      let closedId = process.id.substr(5);
+      let closedId = process.id.substring(0, 5);
       if (curGame !== undefined && closedId === curGame.id) {
         curActivity = createActivity();
         curGame = undefined;
       }
     }
   })
+}
 
-  registerSub(flashpoint.newDisposable(() => {
-    flashpoint.log.debug('Shutting down Discord RPC client...');
-    client.destroy();
-  }))
+export async function deactivative() {
+  if (client) {
+    flashpoint.log.debug('Shutting down Discord RPC Client');
+    try {
+      await client.destroy();
+    } catch (err) {
+      flashpoint.log.debug(`Error shutting down Discord RPC Client:\n${err}`);
+    }
+  }
 }
 
 async function setActivity(client: DiscordRPC.Client, activity: DiscordRPC.Presence) {
