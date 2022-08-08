@@ -27,7 +27,7 @@ export async function activate(context: flashpoint.ExtensionContext) {
 
   flashpoint.services.onServiceRemove((process) => {
     if (process.id.startsWith('game.') && process.id.length > 5) {
-      let closedId = process.id.substring(0, 5);
+      let closedId = process.id.substring(5);
       if (curGame !== undefined && closedId === curGame.id) {
         curActivity = createActivity();
         curGame = undefined;
@@ -36,7 +36,7 @@ export async function activate(context: flashpoint.ExtensionContext) {
   })
 }
 
-export async function deactivative() {
+export async function deactivate() {
   if (client) {
     flashpoint.log.debug('Shutting down Discord RPC Client');
     try {
@@ -61,8 +61,8 @@ function createActivity(game?: flashpoint.Game): DiscordRPC.Presence {
       game.publisher !== '' ? game.publisher : undefined;
     const state = owner ? formatOwners(owner) : game.platform;
     return { 
-      details: game.title,
-      state: state,
+      details: ensureStringLength(game.title),
+      state: ensureStringLength(state),
       startTimestamp: new Date(),
       largeImageKey: `logo_${game.platform.toLowerCase().replace(' ', '-')}`,
       largeImageText: game.platform,
@@ -90,4 +90,16 @@ function formatOwners(owners: string) {
     return `By ${split[0].trim()} & ${split[1].trim()}`; 
   }
   return `By ${split[0].trim()} & ${split.length - 1} Others`;
+}
+
+// Strings passed to Discord must have a length of 2 to 128 characters (inclusive)
+// But let's limit it to 64 characters just to be safe
+function ensureStringLength(str: string) {
+  const minLength = 2;
+  const maxLength = 64;
+  if (str.length > maxLength) {
+    return str.substring(0, maxLength - 1) + '…';
+  } else {
+    return str.padEnd(minLength);
+  }
 }
