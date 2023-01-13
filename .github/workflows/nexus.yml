@@ -1,0 +1,31 @@
+name: Nexus Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install Dependencies
+        run: npm install
+      - name: Build and Package Release
+        run: npm run package
+      - name: Deploy to Nexus
+        uses: sonatype-nexus-community/nexus-repo-github-action@master
+        with:
+          serverUrl: https://nexus-dev.unstable.life
+          username: github
+          password: ${{ secrets.NEXUS_PASSWORD }}
+          format: raw
+          repository: launcher
+          coordinates: directory=/
+          assets: filename=extension-discord.zip
+          filename: extension.fplx

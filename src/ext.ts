@@ -9,31 +9,35 @@ export async function activate(context: flashpoint.ExtensionContext) {
   let curActivity = createActivity();
   let curGame: flashpoint.Game | undefined = undefined;
 
-  client = new DiscordRPC.Client({ transport: 'ipc' });
-  client.on('ready', () => {
-    flashpoint.log.debug('Discord RPC Connected!');
-    setActivity(client, curActivity);
-    setInterval(() => {
+  try {
+    client = new DiscordRPC.Client({ transport: 'ipc' });
+    client.on('ready', () => {
+      flashpoint.log.debug('Discord RPC Connected!');
       setActivity(client, curActivity);
-    }, 15000);
-  });
-  client.login({ clientId }).catch(flashpoint.log.error);
+      setInterval(() => {
+        setActivity(client, curActivity);
+      }, 15000);
+    });
+    client.login({ clientId }).catch(flashpoint.log.error);
 
-  flashpoint.games.onDidLaunchGame((game) => {
-    if (!flashpoint.getExtConfigValue('com.discord-rich-presence.show-extreme') && flashpoint.games.isGameExtreme(game)) { return; }
-    curActivity = createActivity(game);
-    curGame = game;
-  });
+    registerSub(flashpoint.games.onDidLaunchGame((game) => {
+      if (!flashpoint.getExtConfigValue('com.discord-rich-presence.show-extreme') && flashpoint.games.isGameExtreme(game)) { return; }
+      curActivity = createActivity(game);
+      curGame = game;
+    }));
 
-  flashpoint.services.onServiceRemove((process) => {
-    if (process.id.startsWith('game.') && process.id.length > 5) {
-      let closedId = process.id.substring(5);
-      if (curGame !== undefined && closedId === curGame.id) {
-        curActivity = createActivity();
-        curGame = undefined;
+    registerSub(flashpoint.services.onServiceRemove((process) => {
+      if (process.id.startsWith('game.') && process.id.length > 5) {
+        let closedId = process.id.substring(5);
+        if (curGame !== undefined && closedId === curGame.id) {
+          curActivity = createActivity();
+          curGame = undefined;
+        }
       }
-    }
-  })
+    }));
+  } catch (err) {
+    flashpoint.log.error(`Error initializing Discord RPC Client:\n${err}`);
+  }
 }
 
 export async function deactivate() {
@@ -48,7 +52,9 @@ export async function deactivate() {
 }
 
 async function setActivity(client: DiscordRPC.Client, activity: DiscordRPC.Presence) {
-  return client.setActivity(activity);
+  return client.setActivity(activity).catch((err) => {
+    flashpoint.log.error(`Error setting Discord Activity:\n${err}`);
+  });
 }
 
 function createActivity(game?: flashpoint.Game): DiscordRPC.Presence {
