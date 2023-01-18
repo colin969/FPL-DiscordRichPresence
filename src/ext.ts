@@ -59,7 +59,6 @@ async function setActivity(client: DiscordRPC.Client, activity: DiscordRPC.Prese
 
 function createActivity(game?: flashpoint.Game): DiscordRPC.Presence {
   if (game) {
-    flashpoint.log.debug(`Game:\n ${JSON.stringify(game, null, 2)}`);
     const playing = game.library === 'arcade';
     const imageKey = playing ? 'game' : 'animation';
     const imageText = playing ? 'Game' : 'Animation';
