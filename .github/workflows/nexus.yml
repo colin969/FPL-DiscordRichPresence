@@ -20,6 +20,7 @@ jobs:
         run: npm run package
       - name: Generate Metadata
         run: |
+          sudo apt install libarchive-zip-perl -y
           jq --null-input \
             --arg name     "Discord Rich Presence" \
             --arg desc     "Discord integration to show games you're playing" \
@@ -59,7 +60,6 @@ jobs:
           filename: metadata.json
       - name: Generate components.xml
         run: |
-          apt install libarchive-zip-perl -y
           git clone https://gitlab.unstable.life/flashpoint/docker/nexus-deploy-action.git nexus
           cd nexus
           python3 ./merge-metadata.py "https://nexus-dev.unstable.life/service/rest/v1/search?repository=development&name=*.json" components.xml
