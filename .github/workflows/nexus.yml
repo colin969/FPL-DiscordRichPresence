@@ -18,14 +18,58 @@ jobs:
         run: npm install
       - name: Build and Package Release
         run: npm run package
-      - name: Deploy to Nexus
+      - name: Generate Metadata
+        run: |
+          jq --null-input \
+            --arg name     "Discord Rich Presence" \
+            --arg desc     "Discord integration to show games you're playing" \
+            --arg date     $(date +%s) \
+            --arg download $(du -b extension.fplx | awk '{print $1}') \
+            --arg install  $(7z l extension.fplx | tail -n 1 | awk '{print $3}') \
+            --arg hash     $(crc32 extension.fplx) \
+            '{ 
+              "title": $name,
+              "description": $desc,
+              "date-modified": $date,
+              "download-size": $download,
+              "install-size": $install,
+              "crc32": $hash 
+            }' > metadata.json
+      - name: Deploy File to Nexus
         uses: sonatype-nexus-community/nexus-repo-github-action@master
         with:
           serverUrl: https://nexus-dev.unstable.life
           username: github
           password: ${{ secrets.NEXUS_PASSWORD }}
           format: raw
-          repository: launcher
+          repository: components
           coordinates: directory=/
           assets: filename=extension-discord.zip
           filename: extension.fplx
+      - name: Deploy Metadata to Nexus
+        uses: sonatype-nexus-community/nexus-repo-github-action@master
+        with:
+          serverUrl: https://nexus-dev.unstable.life
+          username: github
+          password: ${{ secrets.NEXUS_PASSWORD }}
+          format: raw
+          repository: components
+          coordinates: directory=/
+          assets: filename=extension-discord.json
+          filename: metadata.json
+      - name: Generate components.xml
+        run: |
+          git clone https://gitlab.unstable.life/flashpoint/docker/nexus-deploy-action.git nexus
+          cd nexus
+          python3 ./merge-metadata.py "https://nexus-dev.unstable.life/service/rest/v1/search?repository=development&name=*.json" components.xml
+      - name: Deploy components.xml to Nexus
+        uses: sonatype-nexus-community/nexus-repo-github-action@master
+        with:
+          serverUrl: https://nexus-dev.unstable.life
+          username: github
+          password: ${{ secrets.NEXUS_PASSWORD }}
+          format: raw
+          repository: components
+          coordinates: directory=/
+          assets: filename=components.xml
+          filename: components.xml
