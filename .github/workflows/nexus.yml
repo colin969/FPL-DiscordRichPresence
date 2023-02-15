@@ -27,6 +27,7 @@ jobs:
             --arg date     $(date +%s) \
             --arg download $(du -b extension.fplx | awk '{print $1}') \
             --arg install  $(7z l extension.fplx | tail -n 1 | awk '{print $3}') \
+            --arg path     "Data/Extensions" \
             --arg hash     $(crc32 extension.fplx) \
             '{ 
               "title": $name,
@@ -34,6 +35,7 @@ jobs:
               "date-modified": $date,
               "download-size": $download,
               "install-size": $install,
+              "path": $path,
               "crc32": $hash 
             }' > metadata.json
       - name: Deploy File to Nexus
