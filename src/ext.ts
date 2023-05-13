@@ -64,13 +64,16 @@ function createActivity(game?: flashpoint.Game): DiscordRPC.Presence {
     const imageText = playing ? 'Game' : 'Animation';
     const owner = game.developer !== '' ? game.developer :
       game.publisher !== '' ? game.publisher : undefined;
-    const state = owner ? formatOwners(owner) : game.platform;
+    const platform = game.platforms.length > 0 ?
+      game.platforms[0].primaryAlias.name :
+      'No Platform';
+    const state = owner ? formatOwners(owner) : platform;
     return { 
       details: ensureStringLength(game.title),
       state: ensureStringLength(state),
       startTimestamp: new Date(),
-      largeImageKey: `logo_${game.platform.toLowerCase().replace(' ', '-')}`,
-      largeImageText: game.platform,
+      largeImageKey: `logo_${platform.toLowerCase().replace(' ', '-')}`,
+      largeImageText: platform,
       smallImageKey: imageKey,
       smallImageText: imageText,
       instance: false

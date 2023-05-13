@@ -1,9 +1,9 @@
 {
   "name": "discord-rich-presence",
   "displayName": "Discord Rich Presence",
-  "author": "Colin Berry",
+  "author": "Colin",
   "version": "1.0.1",
-  "launcherVersion": "10.1.0",
+  "launcherVersion": "12.0.0",
   "description": "Shows the games you're playing on your Discord presence.",
   "icon": "icon.png",
   "main": "./dist/ext.js",
@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@types/discord-rpc": "^4.0.3",
-    "@types/flashpoint-launcher": "^10.1.0",
     "@types/node": "16.x",
     "gulp": "^4.0.2",
     "gulp-zip": "^4.2.0",
