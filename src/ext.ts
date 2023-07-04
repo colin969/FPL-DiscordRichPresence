@@ -18,6 +18,9 @@ export async function activate(context: flashpoint.ExtensionContext) {
         setActivity(client, curActivity);
       }, 15000);
     });
+    client.on('error', (err) => {
+      flashpoint.log.error(err);
+    });
     client.login({ clientId }).catch(flashpoint.log.error);
 
     registerSub(flashpoint.games.onDidLaunchGame((game) => {
