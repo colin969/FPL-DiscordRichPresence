@@ -68,7 +68,7 @@ function createActivity(game?: flashpoint.Game): DiscordRPC.Presence {
     const owner = game.developer !== '' ? game.developer :
       game.publisher !== '' ? game.publisher : undefined;
     const platform = game.platforms.length > 0 ?
-      game.platforms[0].primaryAlias.name :
+      game.platforms[0] :
       'No Platform';
     const state = owner ? formatOwners(owner) : platform;
     return { 
