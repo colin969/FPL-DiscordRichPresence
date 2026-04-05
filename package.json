@@ -2,7 +2,7 @@
   "name": "discord-rich-presence",
   "displayName": "Discord Rich Presence",
   "author": "Colin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "launcherVersion": "12.0.0",
   "description": "Shows the games you're playing on your Discord presence.",
   "icon": "icon.png",

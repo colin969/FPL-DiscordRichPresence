@@ -9,26 +9,19 @@ export async function activate(context: flashpoint.ExtensionContext) {
   let curActivity = createActivity();
   let curGame: flashpoint.Game | undefined = undefined;
 
-  try {
-    client = new DiscordRPC.Client({ transport: 'ipc' });
-    client.on('ready', () => {
-      flashpoint.log.debug('Discord RPC Connected!');
+  client = new DiscordRPC.Client({ transport: 'ipc' });
+  client.on('ready', () => {
+    flashpoint.log.debug('Discord RPC Connected!');
+    setActivity(client, curActivity);
+    setInterval(() => {
       setActivity(client, curActivity);
-      setInterval(() => {
-        setActivity(client, curActivity);
-      }, 15000);
-    });
-    client.on('error', (err) => {
-      flashpoint.log.error(err);
-    });
-    client.login({ clientId }).catch(flashpoint.log.error);
+    }, 15000);
 
     registerSub(flashpoint.games.onDidLaunchGame((game) => {
       if (!flashpoint.getExtConfigValue('com.discord-rich-presence.show-extreme') && flashpoint.games.isGameExtreme(game)) { return; }
       curActivity = createActivity(game);
       curGame = game;
     }));
-
     registerSub(flashpoint.services.onServiceRemove((process) => {
       if (process.id.startsWith('game.') && process.id.length > 5) {
         let closedId = process.id.substring(5);
@@ -38,9 +31,14 @@ export async function activate(context: flashpoint.ExtensionContext) {
         }
       }
     }));
-  } catch (err) {
-    flashpoint.log.error(`Error initializing Discord RPC Client:\n${err}`);
-  }
+  });
+  client.on('error', (err) => {
+    flashpoint.log.error(err);
+  });
+  client.login({ clientId }).catch((err) => {
+    client = undefined;
+    flashpoint.log.error(err);
+  });
 }
 
 export async function deactivate() {
@@ -48,7 +46,7 @@ export async function deactivate() {
     flashpoint.log.debug('Shutting down Discord RPC Client');
     try {
       client.clearActivity();
-      await client.destroy();
+      client.destroy();
     } catch (err) {
       flashpoint.log.debug(`Error shutting down Discord RPC Client:\n${err}`);
     }
